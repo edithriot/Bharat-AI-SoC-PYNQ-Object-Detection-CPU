@@ -208,3 +208,8 @@ The measured metrics provide:
 - A benchmarking foundation for future Vitis HLS-based hardware design  
 
 This baseline will be used for comparison against upcoming FPGA-accelerated implementations.
+
+
+## OUTPUTS
+
+<img width="471" height="292" alt="Screenshot 2026-02-20 122338" src="https://github.com/user-attachments/assets/2c4d843c-6893-4bb5-902e-3fbbf7991c29" />
