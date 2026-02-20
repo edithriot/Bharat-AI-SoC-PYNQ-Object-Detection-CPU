@@ -86,7 +86,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 ```
-Explanation
+# Explanation
 
 cv2 – OpenCV for image processing and detection
 
@@ -98,8 +98,8 @@ matplotlib – Visualization
 
 time – Performance measurement
 
-2. Image Dataset Loading Module
-```python
+## 2. Image Dataset Loading Module
+```
 img_dir = "/home/xilinx/jupyter_notebooks/images"
 
 image_paths = sorted(
@@ -110,7 +110,7 @@ image_paths = sorted(
 
 print("Total images:", len(image_paths))
 ```
-```python
+```
 img_dir = "/home/xilinx/jupyter_notebooks/images"
 
 image_paths = sorted(
@@ -122,7 +122,7 @@ image_paths = sorted(
 print("Total images:", len(image_paths))
 ```
 
-Explanation
+# Explanation
 
 Specifies dataset directory
 
@@ -130,14 +130,14 @@ Loads .jpg, .png, and .jpeg files
 
 Sorting ensures repeatable benchmarking
 
-3. HOG + SVM Detector Initialization
+## 3. HOG + SVM Detector Initialization
 
 ```python
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 ```
 
-Explanation
+# Explanation
 
 Initializes HOG feature extractor
 
@@ -145,7 +145,7 @@ Uses pre-trained SVM pedestrian detector
 
 Core detection engine executed on CPU
 
-4. Non-Maximum Suppression (NMS)
+## 4. Non-Maximum Suppression (NMS)
 
 ```
  
@@ -180,7 +180,7 @@ def non_max_suppression(boxes, overlapThresh=0.4):
 
     return boxes[pick].astype("int")
 ```
-Explanation
+# Explanation
 
 Removes overlapping bounding boxes
 
@@ -188,7 +188,7 @@ Retains highest-confidence detections
 
 Improves detection quality
 
-5. Performance Initialization
+## 5. Performance Initialization
 
 ```
 
@@ -198,7 +198,7 @@ total_start = time.time()
 
 Stores per-image latency and tracks total runtime.
 
-6. Detection Loop
+## 6. Detection Loop
 
 ```
 for img_path in image_paths:
@@ -209,7 +209,7 @@ for img_path in image_paths:
 
 Iterates through dataset and skips invalid images.
 
-7. Image Preprocessing
+## 7. Image Preprocessing
 
 ```
 python
@@ -219,7 +219,7 @@ scale = 640.0 / w
 img = cv2.resize(img, (640, int(h * scale)))
 ```
 
-8. Inference Timing
+## 8. Inference Timing
 ```
 start = time.time()
 
@@ -233,7 +233,7 @@ rects, weights = hog.detectMultiScale(
 
 Timing begins only for detection stage.
 
-9. Bounding Box Filtering
+## 9. Bounding Box Filtering
 
 ```
 boxes = []
@@ -245,7 +245,7 @@ final_boxes = non_max_suppression(boxes, overlapThresh=0.4)
 ```
 Filters low-confidence detections and applies NMS.
 
-10. Latency Measurement
+## 10. Latency Measurement
 
 ```
 end = time.time()
@@ -254,7 +254,7 @@ latencies.append(latency)
 ```
 Stores per-image inference time.
 
-11. Visualization
+## 11. Visualization
 
 ```
 for (x1, y1, x2, y2) in final_boxes:
@@ -263,7 +263,7 @@ for (x1, y1, x2, y2) in final_boxes:
                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 ```
 
-12. Performance Summary
+## 12. Performance Summary
 
 ```
 latencies = np.array(latencies)
