@@ -212,14 +212,10 @@ This baseline will be used for comparison against upcoming FPGA-accelerated impl
 
 ## OUTPUTS
 
-<img width="392" height="159" alt="Screenshot 2026-02-20 142916" src="https://github.com/user-attachments/assets/442b51a0-9879-4a0d-93dc-11c8f1fc0ced" />
-
-
-<img width="471" height="292" alt="Screenshot 2026-02-20 122338" src="https://github.com/user-attachments/assets/2c4d843c-6893-4bb5-902e-3fbbf7991c29" />
-
-<img width="587" height="338" alt="Screenshot 2026-02-20 142117" src="https://github.com/user-attachments/assets/08f35116-3af1-45fb-a1f9-b8775860727e" />
-
-
+<img src="https://github.com/user-attachments/assets/442b51a0-9879-4a0d-93dc-11c8f1fc0ced" width="600"/>
+<img src="https://github.com/user-attachments/assets/2c4d843c-6893-4bb5-902e-3fbbf7991c29" width="600"/>
+<img src="https://github.com/user-attachments/assets/08f35116-3af1-45fb-a1f9-b8775860727e" width="600"/>
+<img src="https://github.com/user-attachments/assets/6a34b603-2332-43e9-81af-7a05b457efe6" width="600"/>
 
 <img width="428" height="341" alt="Screenshot 2026-02-20 142103" src="https://github.com/user-attachments/assets/6a34b603-2332-43e9-81af-7a05b457efe6" />
 
