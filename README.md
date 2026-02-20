@@ -1,21 +1,23 @@
 # Bharat AI-SoC Student Challenge  
-## Object Detection on Xilinx PYNQ-Z2 (CPU Baseline Implementation)
+## CPU-Only Object Detection Baseline on Xilinx PYNQ-Z2
 
 ---
 
-## Project Context
+## Overview
 
-This project is developed under **Problem Statement 5** of the **Bharat AI-SoC Student Challenge**, which focuses on real-time object detection on embedded platforms using heterogeneous SoCs.
+This project implements a complete **CPU-only object detection pipeline** on the PYNQ-Z2 platform under **Problem Statement 5** of the Bharat AI-SoC Student Challenge.  
+The system runs entirely on the **Arm Cortex-A9 (Processing System)** of the **Zynq-7020 SoC**, without any FPGA acceleration.
 
-As part of this work, a **CPU-only baseline object detection system** has been implemented and evaluated on the **Xilinx PYNQ-Z2 FPGA board**. This implementation serves as a **software reference model** and performance baseline for future hardware-accelerated designs.
+This implementation serves as a **software reference baseline** for future hardware-accelerated (FPGA-based) designs.
 
 ---
 
-## Objective
+## Objectives
 
-- Implement an object detection pipeline on the **Arm Cortex-A9 processor** of the PYNQ-Z2 board  
-- Measure inference latency and throughput on embedded hardware  
-- Establish a **quantitative baseline** for comparison with future FPGA-accelerated implementations  
+- Develop a pedestrian detection system on embedded Linux  
+- Execute the entire detection pipeline on the CPU  
+- Measure latency and throughput on real hardware  
+- Establish a quantitative performance baseline  
 
 ---
 
@@ -24,25 +26,7 @@ As part of this work, a **CPU-only baseline object detection system** has been i
 - **Board**: Xilinx PYNQ-Z2  
 - **SoC**: Zynq-7020  
 - **Processor**: Dual-core Arm Cortex-A9  
-- **Execution Environment**: PYNQ Linux + Jupyter Notebook  
-
----
-
-## Implementation Overview
-
-The current implementation performs **object detection entirely on the CPU** using Python and OpenCV. The system detects pedestrians in images using a classical computer vision pipeline.
-
-### Detection Pipeline
-
-1. Load images from a dataset  
-2. Resize images while preserving aspect ratio  
-3. Extract features using **Histogram of Oriented Gradients (HOG)**  
-4. Perform classification using a **pre-trained Support Vector Machine (SVM)**  
-5. Apply **Non-Maximum Suppression (NMS)** to remove redundant detections  
-6. Draw bounding boxes and visualize results  
-7. Measure inference latency and throughput  
-
-All stages are executed on the Arm processor without FPGA acceleration.
+- **Environment**: PYNQ Linux + Jupyter Notebook  
 
 ---
 
@@ -52,32 +36,27 @@ All stages are executed on the Arm processor without FPGA acceleration.
 - OpenCV  
 - NumPy  
 - Matplotlib  
-- Jupyter Notebook (PYNQ Framework)  
+- PYNQ Framework  
 
 ---
 
-## Performance Measurement Methodology
+## Detection Method
 
-- Inference latency is measured **only for the detection stage**, excluding visualization overhead  
-- Timing is captured for each image independently  
-- The following metrics are computed:
-  - Average inference latency (ms)
-  - Minimum latency (ms)
-  - Maximum latency (ms)
-  - Throughput (Frames Per Second – FPS)
-  - Total execution time  
+The system uses a classical computer vision approach:
 
-This methodology ensures consistent and fair benchmarking on embedded hardware.
+1. Image loading  
+2. Image resizing (aspect ratio preserved)  
+3. HOG feature extraction  
+4. SVM-based pedestrian classification  
+5. Non-Maximum Suppression (NMS)  
+6. Bounding box visualization  
+7. Performance benchmarking  
 
----
-
-# CPU Object Detection Implementation (Module-wise Explanation)
-
-This section describes the complete CPU-only object detection pipeline implemented on the Xilinx PYNQ-Z2 platform using Python and OpenCV.
+All computation runs on the CPU.
 
 ---
 
-## 1. Library Imports and Dependencies
+# Complete CPU Object Detection Implementation
 
 ```python
 import cv2
@@ -85,21 +64,11 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-```
-# Explanation
 
-cv2 – OpenCV for image processing and detection
+# ==============================
+# Dataset Loading
+# ==============================
 
-glob – Load multiple images from directory
-
-numpy – Numerical operations
-
-matplotlib – Visualization
-
-time – Performance measurement
-
-## 2. Image Dataset Loading Module
-```
 img_dir = "/home/xilinx/jupyter_notebooks/images"
 
 image_paths = sorted(
@@ -109,46 +78,18 @@ image_paths = sorted(
 )
 
 print("Total images:", len(image_paths))
-```
-```
-img_dir = "/home/xilinx/jupyter_notebooks/images"
 
-image_paths = sorted(
-    glob.glob(img_dir + "/*.jpg") +
-    glob.glob(img_dir + "/*.png") +
-    glob.glob(img_dir + "/*.jpeg")
-)
+# ==============================
+# HOG + SVM Initialization
+# ==============================
 
-print("Total images:", len(image_paths))
-```
-
-# Explanation
-
-Specifies dataset directory
-
-Loads .jpg, .png, and .jpeg files
-
-Sorting ensures repeatable benchmarking
-
-## 3. HOG + SVM Detector Initialization
-
-```python
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-```
 
-# Explanation
+# ==============================
+# Non-Maximum Suppression
+# ==============================
 
-Initializes HOG feature extractor
-
-Uses pre-trained SVM pedestrian detector
-
-Core detection engine executed on CPU
-
-## 4. Non-Maximum Suppression (NMS)
-
-```
- 
 def non_max_suppression(boxes, overlapThresh=0.4):
     if len(boxes) == 0:
         return []
@@ -179,93 +120,64 @@ def non_max_suppression(boxes, overlapThresh=0.4):
         )
 
     return boxes[pick].astype("int")
-```
-# Explanation
 
-Removes overlapping bounding boxes
-
-Retains highest-confidence detections
-
-Improves detection quality
-
-## 5. Performance Initialization
-
-```
+# ==============================
+# Performance Tracking
+# ==============================
 
 latencies = []
 total_start = time.time()
-```
 
-Stores per-image latency and tracks total runtime.
+# ==============================
+# Detection Loop
+# ==============================
 
-## 6. Detection Loop
-
-```
 for img_path in image_paths:
+
     img = cv2.imread(img_path)
     if img is None:
         continue
-```
 
-Iterates through dataset and skips invalid images.
+    # Resize while preserving aspect ratio
+    h, w = img.shape[:2]
+    scale = 640.0 / w
+    img = cv2.resize(img, (640, int(h * scale)))
 
-## 7. Image Preprocessing
+    # Detection timing start
+    start = time.time()
 
-```
-python
+    rects, weights = hog.detectMultiScale(
+        img,
+        winStride=(8, 8),
+        padding=(16, 16),
+        scale=1.03
+    )
 
-h, w = img.shape[:2]
-scale = 640.0 / w
-img = cv2.resize(img, (640, int(h * scale)))
-```
+    # Confidence filtering
+    boxes = []
+    for (x, y, w_box, h_box), weight in zip(rects, weights):
+        if weight > 0.6:
+            boxes.append([x, y, x + w_box, y + h_box])
 
-## 8. Inference Timing
-```
-start = time.time()
+    # Apply NMS
+    final_boxes = non_max_suppression(boxes, overlapThresh=0.4)
 
-rects, weights = hog.detectMultiScale(
-    img,
-    winStride=(8, 8),
-    padding=(16, 16),
-    scale=1.03
-)
-```
+    # Detection timing end
+    end = time.time()
+    latency = end - start
+    latencies.append(latency)
 
-Timing begins only for detection stage.
+    # Visualization
+    for (x1, y1, x2, y2) in final_boxes:
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        cv2.putText(img, "Person", (x1, y1 - 6),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-## 9. Bounding Box Filtering
+# ==============================
+# Performance Summary
+# ==============================
 
-```
-boxes = []
-for (x, y, w, h), weight in zip(rects, weights):
-    if weight > 0.6:
-        boxes.append([x, y, x + w, y + h])
-
-final_boxes = non_max_suppression(boxes, overlapThresh=0.4)
-```
-Filters low-confidence detections and applies NMS.
-
-## 10. Latency Measurement
-
-```
-end = time.time()
-latency = end - start
-latencies.append(latency)
-```
-Stores per-image inference time.
-
-## 11. Visualization
-
-```
-for (x1, y1, x2, y2) in final_boxes:
-    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    cv2.putText(img, "Person", (x1, y1 - 6),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-```
-
-## 12. Performance Summary
-
-```
+total_end = time.time()
 latencies = np.array(latencies)
 
 avg_latency = latencies.mean()
@@ -283,20 +195,16 @@ print(f"Throughput (FPS)       : {fps:.2f}")
 print(f"Total execution time   : {total_time:.2f} s")
 ```
 
-Computes and prints:
+---
 
-Average latency
+## Results and Significance
 
-Min / Max latency
+This CPU-only implementation validates real-time object detection feasibility on the Arm Cortex-A9 of the PYNQ-Z2.
 
-Throughput (FPS)
+The measured metrics provide:
 
-Total runtime
+- Insight into CPU computational limitations  
+- A quantitative reference for FPGA acceleration  
+- A benchmarking foundation for future Vitis HLS-based hardware design  
 
-Results Summary
-
-The CPU-only implementation successfully performs object detection on the PYNQ-Z2 platform. Performance metrics obtained from this baseline provide:
-
-Insight into CPU computational limits
-
-Reference for future FPGA-based acceleration
+This baseline will be used for comparison against upcoming FPGA-accelerated implementations.
